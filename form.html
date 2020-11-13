@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>bal check</title>
+</head>
+<body>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Phone Number</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+    promise = $.ajax({
+        type:"GET",
+        dataType:"text",
+        url:"./file.csv",
+        cache:false
+    });
+
+    promise.done(function(data){
+
+        //Parse CSV File
+        //split on new line
+        var dataArr = data.split("\n");
+
+        //for each line in array
+        $.each(dataArr,function(){
+            if (this != "") {
+
+                //split files and create row
+                var row = new String("");
+                valArr = this.split(",");
+                    row += "<tr>"
+
+                $.each(valArr, function(){
+                    row += "<td>" + this +"</td>"
+                });     
+
+                    row += "</tr>"
+
+                    //Add row to table
+                    $('tbody').append(row);
+
+            }
+
+        });
+
+    });
+
+    // Run script if request fails
+    promise.fail(function() {
+       console.log('A failure ocurred');
+    });
+
+});
+</script>
+</form>
+</body>
+</html>

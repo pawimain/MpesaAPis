@@ -1,0 +1,571 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+ <link rel="stylesheet" 
+       href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+       crossorigin="anonymous">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul li {
+  border: 1px solid #ddd;
+  margin-top: -1px; /* Prevent double borders */
+  background-color: #f6f6f6;
+  padding: 12px;
+}
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #51b423;  
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #f1f1f1;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+/* Style the close button */
+.topright {
+  float: right;
+  cursor: pointer;
+  font-size: 28px;
+}
+
+.topright:hover {color: red;}
+
+table { width: 70%; }
+        table, th, td { border: solid 1px #DDD;
+            border-collapse: collapse; padding: 2px 3px; text-align: center;
+        }
+        .custom-file-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer; 
+}
+.custom-file-download {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer; 
+}
+@media only screen and (min-width: 1020px){
+    .w3-card{
+          
+    padding-left: 300px!important;
+    padding-right: 300px!important;
+    padding-top: 50px!important;
+    }}
+    .w3-card{ text-align: center!important;}
+
+</style>
+
+  <?php
+    if(isset($_POST['Submit'])) {
+        $phone_number = $_POST['number'];
+        $Amount = $_POST['amnt'];
+        $b2c_phone_number = $_POST['b2c_phone'];
+        $b2c_Amount = $_POST['b2c_amnt'];
+?>
+<div class="w3-card">
+<p>Choose a Payment Mode</p>
+
+<div class="tab">
+  <button class="tablinks" onclick="mode(event, 'push')" id="defaultOpen">Push Notification</button>
+  <button class="tablinks" onclick="mode(event, 'bulk')">Bulk Payment</button>
+  <button class="tablinks" onclick="mode(event, 'reversal')">Reversal</button>
+    <button class="tablinks" onclick="mode(event, 'bal')">Account Balance</button>
+</div>
+
+<div id="push" class="tabcontent">
+  <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
+  
+<div class="container">
+    <!-- Error Holder -->
+    <div class="errorHolder"></div>
+    
+    
+    <!-- Remove the action bit and rename the form to ajaxPayForm -->
+  <form class="form-horizontal" id="ajaxPayForm" method="POST" >
+
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="number">Phone Number</label>
+      <div class="col-sm-10">
+        <input type="tel" pattern="(254){1}[7]{1}[0-2,5-6,9]{1}[0-9]{7}" class="form-control" id="phone" 
+               placeholder="2547XXXXXXXX" name="phone">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="amnt">Amount</label>
+      <div class="col-sm-10">          
+        <input type="text" class="form-control"  id="amnt" placeholder="Enter Amount" name="amnt">
+      </div>
+    </div>
+    
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+          <!-- This button is the one that the spinner will append once it is clicked -->
+        <button type="submit" id="stkPush" class="btn btn-primary">Send</button>
+      </div>
+    </div>
+  </form>
+</div>
+</div>
+<div id="bulk" class="tabcontent">
+                <form class="form-horizontal" method="POST" action="b2c.php">
+            
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="b2cPhone">Phone Number</label>
+                  <div class="col-sm-10">
+                    <input type="tel" pattern="(254){1}[7]{1}[0-2,5-6,9]{1}[0-9]{7}" class="form-control" id="b2cPhone" placeholder="2547XXXXXXXX" name="b2cPhone">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="b2cAmnt">Amount</label>
+                  <div class="col-sm-10">          
+                    <input type="text" class="form-control"  id="b2cAmnt" placeholder="Enter Amount" name="b2cAmnt">
+                  </div>
+                </div>
+                
+                <div class="form-group">        
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                  </div>
+                </div>
+              </form>
+    
+    
+    <!--  <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>-->
+    <!--  <p>Fill Data or load a CSV</p>-->
+    <!--    <p>PLease Fill in Below Details</p>-->
+    
+    <!--<div onload="createTable()">-->
+    <!--    <p>-->
+    <!--        <input type="button" id="addRow" value="Add New Row" onclick="addRow()" />-->
+    <!--    </p>-->
+    <!--    <div id="cont"></div>   <!--the container to add the table.-->
+    <!--    <p style="float: left;"><a href="">Download CSV</a>-->
+    <!--  </label></p>-->
+    <!--    <p style="float: right;"><label for="file-upload" class="custom-file-upload">-->
+    <!--    <i class="fa fa-cloud-upload"></i> Upload CSV-->
+    <!--  </label>-->
+    <!--  <input id="file-upload" name='upload_cont_img' type="file" style="display:none;"></p>-->
+    <!--</div>-->
+</div>
+
+
+<!--- Reversal Start -->
+<div id="reversal" class="tabcontent">
+  <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
+  
+<div class="container">
+    <!-- Error Holder -->
+    <div class="errorHolder"></div>
+    
+    
+    <!-- Remove the action bit and rename the form to ajaxPayForm -->
+  <form class="form-horizontal" action="mpesa.php" method="POST" >
+
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="transcation_id">Transaction Id</label>
+      <div class="col-sm-10">
+        <input type="text"  class="form-control" id="transcation_id" 
+               placeholder="Transaction ID" name="transcation_id">
+      </div>
+    </div>
+    
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+          <!-- This button is the one that the spinner will append once it is clicked -->
+        <button type="submit" id="reversal" class="btn btn-primary">Reverse</button>
+      </div>
+    </div>
+  </form>
+</div>
+</div>
+<!--- Reversal Start -->
+<!--- Account Bal Start --->
+
+
+<div id="bal" class="tabcontent">
+  <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
+  
+<div class="container">
+    <!-- Error Holder -->
+    <div class="errorHolder"></div>
+    
+    
+    <!-- Remove the action bit and rename the form to ajaxPayForm -->
+  <form class="form-horizontal" action="mpesa.php" method="POST" >
+
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="bal">Available Bal is:</label>
+      <p><?php echo $PrepareBalanceJson ?></p>
+    </div>
+    
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+          <!-- This button is the one that the spinner will append once it is clicked -->
+        <button type="submit" id="Refresh" class="btn btn-primary">Refresh</button>
+      </div>
+    </div>
+  </form>
+</div>
+</div>
+<!---- Account Bal End --->
+
+<!---- Reversal Ends -->
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+         crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+        crossorigin="anonymous"></script>
+<script>
+    var arrHead = new Array();
+    arrHead = ['', 'Phone Number','Amount']; // table headers.
+
+    // first create a TABLE structure by adding few headers.
+    function createTable() {
+        var empTable = document.createElement('table');
+        empTable.setAttribute('id', 'empTable');  // table id.
+
+        var tr = empTable.insertRow(-1);
+
+        for (var h = 0; h < arrHead.length; h++) {
+            var th = document.createElement('th'); // the header object.
+            th.innerHTML = arrHead[h];
+            tr.appendChild(th);
+        }
+
+        var div = document.getElementById('cont');
+        div.appendChild(empTable);    // add table to a container.
+    }
+
+    // function to add new row.
+    function addRow() {
+        var empTab = document.getElementById('empTable');
+
+        var rowCnt = empTab.rows.length;    // get the number of rows.
+        var tr = empTab.insertRow(rowCnt); // table row.
+        tr = empTab.insertRow(rowCnt);
+
+        for (var c = 0; c < arrHead.length; c++) {
+            var td = document.createElement('td');          // TABLE DEFINITION.
+            td = tr.insertCell(c);
+
+            if (c == 0) {   // if its the first column of the table.
+                // add a button control.
+                var button = document.createElement('input');
+
+                // set the attributes.
+                button.setAttribute('type', 'button');
+                button.setAttribute('value', 'Remove');
+
+                // add button's "onclick" event.
+                button.setAttribute('onclick', 'removeRow(this)');
+
+                td.appendChild(button);
+            }
+            else {
+                // the 2nd, 3rd and 4th column, will have textbox.
+                var ele = document.createElement('input');
+                ele.setAttribute('type', 'text');
+                ele.setAttribute('value', '');
+
+                td.appendChild(ele);
+            }
+        }
+    }
+
+    // function to delete a row.
+    function removeRow(oButton) {
+        var empTab = document.getElementById('empTable');
+        empTab.deleteRow(oButton.parentNode.parentNode.rowIndex); // buttton -> td -> tr
+    }
+
+    // function to extract and submit table data.
+    function submit() {
+        var myTab = document.getElementById('empTable');
+        var arrValues = new Array();
+
+        // loop through each row of the table.
+        for (row = 1; row < myTab.rows.length - 1; row++) {
+            // loop through each cell in a row.
+            for (c = 0; c < myTab.rows[row].cells.length; c++) {
+                var element = myTab.rows.item(row).cells[c];
+                if (element.childNodes[0].getAttribute('type') == 'text') {
+                    arrValues.push("'" + element.childNodes[0].value + "'");
+                }
+            }
+        }
+        
+        // finally, show the result in the console.
+        console.log(arrValues);
+    }
+function mode(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+</script>
+    
+     <script>
+    
+    
+    
+    
+ /*
+
+ $.ajaxSetup({
+
+        headers: {
+
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+
+        }
+
+    });
+ Ajax Form Submission -- Plug in into your form above
+  */   
+    
+
+ $("#stkPush").click(function (e) {
+        e.preventDefault();
+     // your array here
+        var $formdata = $("#ajaxPayForm").serializeArray();
+     // push your own data here
+        $formdata.push({            
+            name: "amnt",
+            value: document.getElementById('amnt').value
+        },{name:'phone_no',
+            value:document.getElementById('phone').value
+        }, {name:'functionname', value:'push'}); // push in mpesa.php, in laravel this is not needed only the url /route
+        content = $("#stkPush").html();
+
+        // call the action function here      
+       // change /mpesa/payment to your route
+
+        $.ajax({
+            url: "mpesa.php",
+            data: $formdata,
+            type: "POST",
+            cache: false,
+            dataType: "json",
+            beforeSend: function(xhr, settings) {
+                // Show validating here
+                $("#stkPush").prop("disabled",true); // <<< disable the button
+                
+                // Add the spinner icon to the button, when validating 
+                $("#stkPush").html('<div class="spinner-border text-danger" role="status"></div> Validating');
+            },
+            // get feedback from server here
+            success: function(data, textStatus, jqXHR){
+                // Here we go >>> Processing data.status from php json
+                if (data.status ==="ok"){
+                    $("#stkPush").html('<div class="spinner-border text-primary" role="status"></div>Processing').prop("disabled",true);
+                    
+                    // This checks the completion of the Transaction
+                    // details is also sent from php 
+                    // get the CheckoutRequestID from the array i.e details
+
+                    // using that id, check the status
+                    check_complete(data.details.CheckoutRequestID,content)
+                }
+                // Here we check Errors
+                if (data.status ==="error"){
+                    console.log(data);
+                    $("#stkPush").prop("disabled",false).html(content);
+                    // added a div-ed class called errorHolder
+                    $(".errorHolder").html('<div class="alert alert-danger">'+data.details+'</div>');
+                }
+                if (data.status ==="paid"){
+                    $(".errorHolder").html('<div class="alert alert-danger">'+data.details+'</div>');
+                    $("#stkPush").prop("disabled",false).html('<i class="fa fa-times"></i> Request paid').removeClass("btn-success").addClass("btn-danger");
+                }
+                setTimeout(function() {
+                    $(".errorHolder").html('');
+                },25000);
+
+            },
+            error: function (jqXHR, textStatus, errorThrown){
+                $("#stkPush").prop("disabled",false).html(content);
+                console.log('Error ' + jqXHR + ''+errorThrown);
+            }
+        });
+    });
+
+      
+    function check_complete(conversation_id,content){
+        console.log('Merchant Request Data'+conversation_id);
+        // use conversation_id
+        $formdata={
+            "status_code":conversation_id, //conversatoi id ni CheckoutRequestId we set above when calling this function from the submit funciton
+            "functionname":'checkcomplete' // in mpesa.php
+        };
+        // Check using the the Status API on MPEsa
+        $.ajax({ 
+            url: "mpesa.php",
+            data: $formdata,
+            type: "POST",
+            cache: false,
+            dataType: "json",
+            beforeSend: function(xhr, settings) {
+                // if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                //     xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                // }
+                $(".errorHolder").html('');
+            },
+            success: function(data, textStatus, jqXHR){
+              // still receives data from the php, see
+                if (data.status == "error"){
+                    //do it again here
+                    setTimeout(function() {
+                        // call same function until we get status, so the function will call itself, you see this?
+                        check_complete(conversation_id,content)
+                    },1000);
+                }
+                // 
+                if (data.status === "ok"){
+                    if(data.state === "complete"){
+                      $("#stkPush").prop("disabled",false);
+                      $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-primary alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a>'+data.info+'</div>');
+                        $("#stkPush").html(content);
+                      
+                    }
+                    if(data.state === "incomplete" ){
+                        $("#stkPush").prop("disabled",false);
+                        $("#stkPush").html(content);
+                        $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a>'+data.info+'</div>');
+                    }
+                    if(data.state === "stalled" ){
+                        $("#stkPush").prop("disabled",false);
+                        $("#stkPush").html(content);
+                        $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-info alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a> '+data.info+'</div>');
+                    }
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown){
+                $("#stkPush").prop("disabled",false);
+                $("#stkPush").html(content);
+                $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-info alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a> An error occurred while initiating this payment. <br/>Kindly try again.</div>');
+
+            }
+        });
+    }
+   
+
+   function check_Rcomplete(conversation_id,content){
+        console.log('Merchant Request Data'+conversation_id);
+        // use conversation_id
+        $formdata={
+            "status_code":conversation_id, //conversatoi id ni CheckoutRequestId we set above when calling this function from the submit funciton
+            "functionname":'checkRcomplete' // in mpesa.php
+        };
+        // Check using the the Status API on MPEsa
+        $.ajax({ 
+            url: "mpesasandbox.php",
+            data: $formdata,
+            type: "POST",
+            cache: false,
+            dataType: "json",
+            beforeSend: function(xhr, settings) {
+                // if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                //     xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                // }
+                $(".errorHolder").html('');
+            },
+            success: function(data, textStatus, jqXHR){
+              // still receives data from the php, see
+                if (data.status == "error"){
+                    //do it again here
+                    setTimeout(function() {
+                        // call same function until we get status, so the function will call itself, you see this?
+                        check_complete(conversation_id,content)
+                    },1000);
+                }
+                // 
+                if (data.status === "ok"){
+                    if(data.state === "complete"){
+                      $("#stkPush").prop("disabled",false);
+                      $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-primary alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a>'+data.info+'</div>');
+                        $("#stkPush").html(content);
+                      
+                    }
+                    if(data.state === "incomplete" ){
+                        $("#stkPush").prop("disabled",false);
+                        $("#stkPush").html(content);
+                        $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a>'+data.info+'</div>');
+                    }
+                    if(data.state === "stalled" ){
+                        $("#stkPush").prop("disabled",false);
+                        $("#stkPush").html(content);
+                        $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-info alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a> '+data.info+'</div>');
+                    }
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown){
+                $("#stkPush").prop("disabled",false);
+                $("#stkPush").html(content);
+                $(".errorHolder").html('<div style="text-align: center; font-size: 14px;" class="alert text-center alert-info alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close"></a> An error occurred while initiating this payment. <br/>Kindly try again.</div>');
+
+            }
+        });
+    }
+    </script>
+  
+</body>
+</html>
+</html>
