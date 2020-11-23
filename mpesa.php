@@ -17,7 +17,8 @@ curl_close($ch);
 // if(curl_errno($ch)){
 //     echo 'Request Error:' . curl_error($ch);
 //     exit();
-// }
+// 
+//}
 $result = json_decode($result);
 $access_token=$result->access_token;
 /*----------End Access token-----------*/
