@@ -14,6 +14,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 
+
 // if(curl_errno($ch)){
 //     echo 'Request Error:' . curl_error($ch);
 //     exit();
